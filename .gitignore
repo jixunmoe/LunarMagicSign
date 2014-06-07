@@ -1,0 +1,9 @@
+mud
+lm222.exe
+__pycache__
+Debug
+Release
+*.mk
+*.d
+*.o
+.codelite
