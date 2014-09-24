@@ -3,21 +3,23 @@ This utility was created to sign "Lunar Magic" executable for my translation pro
 
 This should work with recent version (~2.2.x), 
 
-Note: This is my first c++ project, some code may not readable as you expected QwQ
+Completely rewrite in PURE C! Since the cpp version didn't work as I expected :<
 
 ## Tools used to analyses this thingy
 * IDA
 * OllyDbg
-* Bless Hex Editor
+* Hex Editor
 
 ## About the 2 versions
-I was planning to make the py3 version, then while testing it took too long. So I ported to c++.
+At the beginning, I only did the py3 version, but it seems too slow to sign the file.
 
-py3 version is still usable, just a bit slower.
+So I ported to C++. Since C++ version didn't work well, I re-wrote the whole thing in PURE C.
+
+py3 version is still usable, just signs the file bit slower.
 
 ## Command line usage
 ```bash
-./LunarMagicSign "Lunar Magic CHS.exe" "Lunar Magic CHS Signed.exe"
+./lmSign "Lunar Magic CHS.exe" "Lunar Magic CHS Signed.exe"
 ```
 .. or, using the py3 version
 ```bash
