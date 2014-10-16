@@ -38,7 +38,7 @@ unsigned long searchCriticalCode (char *blockToSearch, long maxLen) {
 	return 0;
 }
 
-void printHex (unsigned char *blockToSearch, unsigned long start, unsigned long len) {
+void printHex (unsigned char *blockToSearch, unsigned int start, unsigned int len) {
 	unsigned char* pos = blockToSearch + start;
 	
 	for (unsigned int i = 0; i < len; i++, pos++)
@@ -47,22 +47,40 @@ void printHex (unsigned char *blockToSearch, unsigned long start, unsigned long 
 	return ;
 }
 
+void printUnsignedInt (unsigned int nNumber) {
+	unsigned char z[sizeof nNumber];
+	memcpy (z, &nNumber, sizeof nNumber);
+	printHex (z, 0, sizeof nNumber);
+}
+
 unsigned char sign_odd (unsigned char i) {
-	return (i << 0x2 | i >> 0x6) ^ 0x29;
+	// ROL i, 2
+	// 0x3f: 0011 1111
+	return ((i & 0x3f) << 2 | (i >> 6)) ^ 0x29;
 }
 
 unsigned char sign_even (unsigned char i) {
-	return (i << 0x5 | i >> 0x3) ^ 0x26;
+	// ROL i, 4
+	// 0x0f: 0000 1111
+	return ((i & 0x0f) << 4 | (i >> 4)) ^ 0x28;
 }
 
 unsigned char sign_odd_r (unsigned char i) {
-	i ^= 0x29;
-	return (i << 0x6 | i >> 0x2);
+	// ROR i, 2
+	// 0x03: 0000 0011
+	i = i ^ 0x29;
+	return (((i & 0x03) << 6) | (i >> 2));
 }
 
 unsigned char sign_even_r (unsigned char i) {
-	i ^= 0x26;
-	return (i << 0x3 | i >> 0x5);
+	// ROR i, 4  :: same as ROL i, 4
+	// 0x0f: 0000 1111
+	i = i ^ 0x28;
+	return ((i & 0x0f) << 4 | (i >> 4));
+}
+
+unsigned int sign_is_pos_odd ( unsigned int nPos ) {
+	return nPos & 2 ? 1 : 0;
 }
 
 unsigned int signBlock (unsigned char *blockToSign, unsigned long start, unsigned long len, unsigned int initalChecksum) {
@@ -70,12 +88,14 @@ unsigned int signBlock (unsigned char *blockToSign, unsigned long start, unsigne
 	unsigned int ret = initalChecksum;
 	
 	for (unsigned int i = 0; i < len; i++) {
-		if (i & 1) {
+		if (i & 2) {
 			ret += sign_odd  (*pos);
 		} else {
 			ret -= sign_even (*pos);
 		}
 		pos ++;
+		
+		// printf ("%8X\n", ret);
 	}
 	
 	return ret;
@@ -92,7 +112,7 @@ void calcExtraBit (unsigned int hashOrigional, unsigned int hashAgainst, unsigne
 	unsigned char* pos = *extraBit;
 
 	for (unsigned int i = 0; i < 8; i++) {
-		if (!(i & 1)) {
+		if (!(i & 2)) {
 			*pos = sign_even_r (sign_odd (*pos));
 		} else {
 			*pos = sign_odd_r (sign_even (*pos));

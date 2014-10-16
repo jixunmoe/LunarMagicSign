@@ -1,6 +1,8 @@
-LMSign_private.*
-LMSign.layout
-Makefile.*
+*.mk
+*.project
+*.workspace
+lmSign.txt
 Makefile
-out
-out~
+.clang
+.codelite
+
