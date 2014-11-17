@@ -23,30 +23,30 @@ OverrideOutputName=LMSign.exe
 HostApplication=
 UseCustomMakefile=0
 CustomMakefile=
-CommandLine=lm222.exe lmfix.exe info.txt
+CommandLine=lm231.exe
 Folders=out
 IncludeVersionInfo=1
 SupportXPThemes=0
-CompilerSet=3
-CompilerSettings=0000000100000000000000000
+CompilerSet=1
+CompilerSettings=0000000000000000001000000
 UnitCount=3
 
 [VersionInfo]
 Major=1
 Minor=0
 Release=0
-Build=169
+Build=204
 LanguageID=1033
 CharsetID=1252
 CompanyName=
-FileVersion=1.0.0.169
+FileVersion=1.0.0.204
 FileDescription=Lunar Magic signer
 InternalName=
 LegalCopyright=
 LegalTrademarks=
 OriginalFilename=
 ProductName=
-ProductVersion=1.0.0.169
+ProductVersion=1.0.0.204
 AutoIncBuildNr=1
 SyncProduct=1
 

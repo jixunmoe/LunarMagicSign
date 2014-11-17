@@ -6,3 +6,8 @@ Makefile
 .clang
 .codelite
 
+LMSign.layout
+LMSign_private.h
+LMSign_private.rc
+Makefile.win
+out/

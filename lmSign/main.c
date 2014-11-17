@@ -8,7 +8,7 @@
 int main(int argc, char *argv[]) {
 	printf (
 	    "Lunar Magic Signer By Jixun\n"
-	    "Version 1.1[For LM 2.30], Use at your own risk.\n"
+	    "Version 1.11[For LM 2.31], Use at your own risk.\n"
 		"\n"
 	    "Lunar Magic was created by FuSoYa:\n"
 	    "http://fusoya.eludevisibility.org/lm/\n"
@@ -21,8 +21,6 @@ int main(int argc, char *argv[]) {
 		printf ("Error: no input nor output specified in argument.\n");
 		return 1;
 	}
-	
-	// printf ("Argument count: %d\n", argc);
 	
 	unsigned char *fSrc;
 	unsigned int fSrcSize = 0;
@@ -42,18 +40,19 @@ int main(int argc, char *argv[]) {
 		
 		if (!(fMudSize = loadFile ( argv[3], &fMud ))) {
 			printf ("Read mud %s failed!", argv[3]);
-			return 1;
+			return 2;
 		}
 	}
 	
 	printf ("Size of source: 0x%08X\n", fSrcSize);
 	
-	// Calculate new hash
-	unsigned int hashOrigional = signBlock (fSrc, 0, fSrcSize, 0);
+	// Calculate new hash for origional program
+	unsigned int hashOrigional = signBlock (fSrc, 0, fSrcSize, 0, 0x10);
 	if (argc == 4) {
-		hashOrigional = signBlock (fMud, 0, fMudSize, hashOrigional);
+		/* The hash starts calculate where it ends last time. */
+		hashOrigional = signBlock (fMud, 0, fMudSize, fSrcSize, hashOrigional);
 	}
-	unsigned int hashAgainst   = ~0 - hashOrigional;
+	unsigned int hashAgainst = ~hashOrigional;
 	
 	unsigned char hashes[8];
 	memcpy (hashes    , &hashOrigional, 4);
@@ -68,22 +67,28 @@ int main(int argc, char *argv[]) {
 	printf ("\n");
 	
 	unsigned char *extraBit;
-	calcExtraBit (hashOrigional, hashAgainst, &extraBit);
+	unsigned int nExtraBytesize = calcExtraBit (hashOrigional, fSrcSize + fMudSize, &extraBit);
 	
 	printf ("Extra bit: ");
-	printHex (extraBit, 0, 8);
+	printHex (extraBit, 0, nExtraBytesize);
 	printf ("\n");
 	
 	// If output is set
 	if (argc > 2) {
 		printf ("Write to file ...\n");
 		FILE *fOut = fopen (argv[2], "wb");
-		fwrite (fSrc, sizeof (char), fSrcSize, fOut);
-		if (argc == 4) {
-			fwrite (fMud, sizeof (char), fMudSize, fOut);
+		fwrite (fSrc, 1, fSrcSize, fOut);
+		// If it has Mud file
+		if (fMudSize) {
+			fwrite (fMud, 1, fMudSize, fOut);
 		}
-		fwrite (hashes, sizeof (char), sizeof (extraBit), fOut);
-		fwrite (extraBit, sizeof (char), sizeof (extraBit), fOut);
+		
+		if (nExtraBytesize && nExtraBytesize > 8) {
+			fwrite (extraBit + 8, 1, nExtraBytesize - 8, fOut);
+		}
+		fwrite (hashes,   1, 8, fOut);
+		if (nExtraBytesize)
+			fwrite (extraBit, 1, 8, fOut);
 		fclose (fOut);
 	}
 	printf ("Done, enjoy~\n");
